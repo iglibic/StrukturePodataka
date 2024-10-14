@@ -1,0 +1,108 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_SIZE 50
+
+/*2. Definirati strukturu osoba(ime, prezime, godina rođenja) i napisati program koji:
+A.dinamički dodaje novi element na početak liste,
+B.ispisuje listu,
+C.dinamički dodaje novi element na kraj liste,
+D.pronalazi element u listi(po prezimenu),
+E.briše određeni element iz liste,
+U zadatku se ne smiju koristiti globalne varijable.*/
+
+struct _person;
+typedef struct _person* position;
+typedef struct _person
+{
+	char name[MAX_SIZE];
+	char lastName[50];
+	int birthYear;
+
+	position next;
+} Person;
+
+position CreatePerson(char* name, char* lastName, int* birthYear)
+{
+	position newPerson = NULL;
+	newPerson = (position)malloc(sizeof(Person));
+	if (!newPerson)
+	{
+		printf("Bad allocation!\n");
+		return NULL;
+	}
+
+	strcpy(newPerson->name, name);
+	strcpy(newPerson->lastName, lastName);
+	newPerson->birthYear = birthYear;
+	newPerson->next = NULL;
+
+	return newPerson;
+}
+
+int PrependList(position head, char* name, char* lastName, int birthYear)
+{
+	position newPerson = NULL;
+	newPerson = CreatePerson(name, lastName, birthYear);
+	if (!newPerson)
+	{
+		printf("Failed in person creation!");
+		return -1;
+	}
+
+	newPerson->next = head->next;
+	head->next = newPerson;
+
+	return EXIT_SUCCESS;
+}
+
+int PrintList(position first)
+{
+	position temp = NULL;
+
+	temp = first;
+	while (temp != NULL)
+	{
+		printf("%s %s %d", temp->name, temp->lastName, temp->birthYear);
+		temp = temp->next;
+	}
+	return EXIT_SUCCESS;
+}
+
+int AppendList(position head, char* name, char* lastName, int birthYear)
+{
+	position newPerson = NULL;
+	position last = NULL;
+}
+
+int InsertAfter(position prev, position newPerson)
+{
+	newPerson->next = prev->next;
+	prev->next = newPerson;
+
+	return EXIT_SUCCESS;
+}
+
+position FindLast(position head)
+{
+	position last = NULL;
+	last = head;
+
+	while (last->next != NULL) 
+	{
+		last = last->next;
+	}
+	return last;
+}
+
+int main()
+{
+	Person head =
+	{
+		.name = {0},
+		.lastName = {0},
+		.birthYear = {0},
+		.next = NULL
+	};
+
+	return 0;
+}
