@@ -1,1 +1,46 @@
-jgjghjgj
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct node* Position;
+typedef struct node {
+	int value;
+	Position left;
+	Position right;
+}Node;
+
+int insert();
+int inorder(Position root);
+int postorder(Position root);
+Position delete(Position root, int value);
+
+
+int inorder(Position root) {
+	if (root) {
+		inorder(root->left);
+		printf("%d", root->value);
+		inorder(root->right);
+	}
+	return EXIT_SUCCESS;
+}
+
+int postorder(Position root) {
+	if (root) {
+		printf("%d", root->value);
+		inorder(root->left);
+		inorder(root->right);
+	}
+	return EXIT_SUCCESS;
+}
+
+Position delete(Position root, int value) {
+	if (root == NULL || root->value == value) {
+		return root;
+	}
+
+}
+int main() {
+
+	return 0;
+}
