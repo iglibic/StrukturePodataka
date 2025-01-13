@@ -10,12 +10,30 @@ typedef struct node {
 	Position right;
 }Node;
 
-int insert();
+Position insert(Position root, int value);
 int inorder(Position root);
 int preorder(Position root);
 int postorder(Position root);
+int levelOrder(Position root);
 Position delete(Position root, int value);
+Position find(Position root, int value);
 
+Position insert(Position root, int value) {
+    if (root == NULL) {
+        root = (Position)malloc(sizeof(Node));
+        if (root == NULL) {
+            printf("Memory allocation failed!\n");
+            return NULL;
+        }
+        root->value = value;
+        root->left = root->right = NULL;
+    }
+    else if (value < root->value)
+        root->left = insert(root->left, value);
+    else if (value > root->value)
+        root->right = insert(root->right, value);
+    return root;
+}
 
 int inorder(Position root) {
 	if (root) {
@@ -48,9 +66,59 @@ Position delete(Position root, int value) {
 	if (root == NULL || root->value == value) {
 		return root;
 	}
-
 }
-int main() {
 
-	return 0;
+Position find(Position root, int value) {
+    if (root == NULL || root->value == value)
+        return root;
+    if (value < root->value)
+        return find(root->left, value);
+    return find(root->right, value);
+}
+
+int main() {
+    Position root = NULL;
+    int choice, value;
+
+    do {
+        printf("\n1. Insert\n2. Inorder\n3. Preorder\n4. Postorder\n5. Level Order\n6. Delete\n7. Find\nEnter your choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+        case 1:
+            printf("Enter value to insert: ");
+            scanf("%d", &value);
+            root = insert(root, value);
+            break;
+        case 2:
+            inorder(root);
+            printf("\n");
+            break;
+        case 3:
+            preorder(root);
+            printf("\n");
+            break;
+        case 4:
+            postorder(root);
+            printf("\n");
+            break;
+        case 5:
+            levelOrder(root);
+            printf("\n");
+            break;
+        case 6:
+            printf("Enter value to delete: ");
+            scanf("%d", &value);
+            root = delete(root, value);
+            break;
+        case 7:
+            printf("Enter value to find: ");
+            scanf("%d", &value);
+            if (find(root, value))
+                printf("Value %d found in tree.\n", value);
+            else
+                printf("Value %d not found.\n", value);
+            break;
+    } while (choice != 8);
+
+    return EXIT_SUCCESS;
 }
