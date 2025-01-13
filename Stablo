@@ -76,6 +76,29 @@ Position find(Position root, int value) {
     return find(root->right, value);
 }
 
+Position delete(Position root, int value) {
+    if (!root) return root;
+    if (value < root->value)
+        root->left = delete(root->left, value);
+    else if (value > root->value)
+        root->right = delete(root->right, value);
+    else {
+        if (!root->left) {
+            Position temp = root->right;
+            free(root);
+            return temp;
+        } else if (!root->right) {
+            Position temp = root->left;
+            free(root);
+            return temp;
+        }
+        Position temp = find(root->right, root->value);
+        root->value = temp->value;
+        root->right = delete(root->right, temp->value);
+    }
+    return root;
+}
+
 int main() {
     Position root = NULL;
     int choice, value;
