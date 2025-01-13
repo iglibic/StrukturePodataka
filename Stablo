@@ -12,6 +12,7 @@ typedef struct node {
 
 int insert();
 int inorder(Position root);
+int preorder(Position root);
 int postorder(Position root);
 Position delete(Position root, int value);
 
@@ -23,6 +24,15 @@ int inorder(Position root) {
 		inorder(root->right);
 	}
 	return EXIT_SUCCESS;
+}
+
+int preorder(Position root) {
+    if (root) {
+        printf("%d ", root->value);
+        preorder(root->left);
+        preorder(root->right);
+    }
+    return EXIT_SUCCESS;
 }
 
 int postorder(Position root) {
