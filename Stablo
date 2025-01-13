@@ -5,9 +5,9 @@
 
 typedef struct node* Position;
 typedef struct node {
-	int value;
-	Position left;
-	Position right;
+    int value;
+    Position left;
+    Position right;
 }Node;
 
 Position insert(Position root, int value);
@@ -36,12 +36,12 @@ Position insert(Position root, int value) {
 }
 
 int inorder(Position root) {
-	if (root) {
-		inorder(root->left);
-		printf("%d", root->value);
-		inorder(root->right);
-	}
-	return EXIT_SUCCESS;
+    if (root) {
+        inorder(root->left);
+        printf("%d ", root->value);
+        inorder(root->right);
+    }
+    return EXIT_SUCCESS;
 }
 
 int preorder(Position root) {
@@ -54,12 +54,12 @@ int preorder(Position root) {
 }
 
 int postorder(Position root) {
-	if (root) {
-		printf("%d", root->value);
-		inorder(root->left);
-		inorder(root->right);
-	}
-	return EXIT_SUCCESS;
+    if (root) {
+        postorder(root->left);
+        postorder(root->right);
+        printf("%d ", root->value);
+    }
+    return EXIT_SUCCESS;
 }
 
 int levelOrder(Position root) {
@@ -88,33 +88,32 @@ Position delete(Position root, int value) {
         root->right = delete(root->right, value);
     }
     else {
-        if (!root->left && !root->right) {
+        if (root->left == NULL && root->right == NULL) {
             free(root);
             return NULL;
         }
-        else if (!root->left) {
+        else if (root->left == NULL) {
             Position temp = root->right;
             free(root);
             return temp;
-        } 
-        else if (!root->right) {
+        }
+        else if (root->right == NULL) {
             Position temp = root->left;
             free(root);
             return temp;
         }
-
-        Position temp = root->right;
-        while (temp && temp->left) {
-            temp = temp->left;
+        else {
+            Position temp = root->right;
+            while (temp->left != NULL) {
+                temp = temp->left;
+            }
+            root->value = temp->value;
+            root->right = delete(root->right, temp->value);
         }
-
-        root->value = temp->value;
-        root->right = delete(root->right, temp->value);
     }
 
     return root;
 }
-
 
 Position find(Position root, int value) {
     if (root == NULL || root->value == value)
@@ -166,6 +165,7 @@ int main() {
             else
                 printf("Value %d not found.\n", value);
             break;
+        }
     } while (choice != 8);
 
     return EXIT_SUCCESS;
