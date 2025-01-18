@@ -1,83 +1,73 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define _CRT_SECURE_NO_WARNINGS
+
 #define MAX 1024
 #define MAX_POINTS 100
+#define FILE_NOT_OPENED (-1)
 
-typedef struct
-{
-    char name[50];
-    char surname[50];
+typedef struct {
+    char name[MAX];
+    char surname[MAX];
     int points;
-} Student;
+} Students;
 
-int NumberOfRows(const char *fileName);
-Student *LoadStudents(const char *fileName, int numberOfStudents);
-void PrintStudents(Student *students, int numberOfStudents);
+int numOfRows(const char* fileName);
+Students* LoadStudents(const char* fileName, int numOfStudents);
+int printStudents(Students* students, int numOfStudents);
 
-int main()
-{
-    const char *fileName = "imedat.txt";
-    int numOfRows = NumberOfRows(fileName);
+int main() {
+    int totalStudents = numOfRows("Studenti.txt");
 
-    if (numOfRows == -1)
-    {
-        printf("Error opening the file.\n");
-        return EXIT_FAILURE; // Replaced ERROR_OF with EXIT_FAILURE
+    if (totalStudents == FILE_NOT_OPENED) {
+        printf("Error: Could not open the file!\n");
+        return FILE_NOT_OPENED;
     }
 
-    Student *students = LoadStudents(fileName, numOfRows);
-
-    if (students == NULL)
-    {
-        printf("Error loading students.\n");
-        return EXIT_FAILURE; // Replaced ERROR_OF with EXIT_FAILURE
+    Students* students = LoadStudents("Studenti.txt", totalStudents);
+    if (students == NULL) {
+        printf("Error: Could not load students!\n");
+        return EXIT_FAILURE;
     }
 
-    PrintStudents(students, numOfRows);
+    printStudents(students, totalStudents);
 
     free(students);
 
-    return EXIT_SUCCESS; // Success message
+    return EXIT_SUCCESS;
 }
 
-int NumberOfRows(const char *fileName)
-{
-    FILE *fp = fopen(fileName, "r");
-    if (!fp)
-    {
-        return -1;
+int numOfRows(const char* fileName) {
+    FILE* fp = fopen(fileName, "r");
+    if (fp == NULL) {
+        return FILE_NOT_OPENED;
     }
 
-    int numOfRows = 0;
-    char buffer[MAX] = {};
+    char buffer[MAX];
+    int totalStudents = 0;
 
-    while (fgets(buffer, MAX, fp))
-    {
-        numOfRows++;
+    while (fgets(buffer, MAX, fp)) {
+        totalStudents++;
     }
 
     fclose(fp);
-    return numOfRows;
+    return totalStudents;
 }
 
-Student *LoadStudents(const char *fileName, int numberOfStudents)
-{
-    FILE *fp = fopen(fileName, "r");
-    if (!fp)
-    {
+Students* LoadStudents(const char* fileName, int numOfStudents) {
+    FILE* fp = fopen(fileName, "r");
+    if (fp == NULL) {
         return NULL;
     }
 
-    Student *students = (Student *)malloc(numberOfStudents * sizeof(Student));
-    if (students == NULL)
-    {
+    Students* students = (Students*)malloc(numOfStudents * sizeof(Students));
+    if (students == NULL) {
         fclose(fp);
         return NULL;
     }
 
-    for (int i = 0; i < numberOfStudents; i++)
-    {
+    for (int i = 0; i < numOfStudents; i++) {
         fscanf(fp, "%s %s %d", students[i].name, students[i].surname, &students[i].points);
     }
 
@@ -85,12 +75,11 @@ Student *LoadStudents(const char *fileName, int numberOfStudents)
     return students;
 }
 
-void PrintStudents(Student *students, int numberOfStudents)
-{
-    for (int i = 0; i < numberOfStudents; i++)
-    {
-        double relativePoints = (double)students[i].points / MAX_POINTS * 100;
-        printf("Name: %s, Surname: %s, Absolute Points: %d, Relative Points: %.2f%%\n",
-               students[i].name, students[i].surname, students[i].points, relativePoints);
+int printStudents(Students* students, int numOfStudents) {
+    for (int i = 0; i < numOfStudents; i++) {
+        float relativePoints = (float)students[i].points / MAX_POINTS * 100;
+        printf("Name: %s, Surname: %s, Points: %d, Relative points: %.2f%%\n",
+            students[i].name, students[i].surname, students[i].points, relativePoints);
     }
+    return 0;
 }
