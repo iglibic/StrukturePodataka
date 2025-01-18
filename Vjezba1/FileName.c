@@ -2,18 +2,18 @@
 #include <stdlib.h>
 #define _CRT_SECURE_NO_WARNINGS
 #define MAX 1024
-#define MAX_BODOVA 100
+#define MAX_POINTS 100
 
 typedef struct
 {
-    char ime[50];
-    char prezime[50];
-    int bodovi;
+    char name[50];
+    char surname[50];
+    int points;
 } Student;
 
 int NumberOfRows(const char *fileName);
-Student *LoadStudents(const char *fileName, int brojStudenata);
-void IspisiStudente(Student *studenti, int brojStudenata);
+Student *LoadStudents(const char *fileName, int numberOfStudents);
+void PrintStudents(Student *students, int numberOfStudents);
 
 int main()
 {
@@ -22,23 +22,23 @@ int main()
 
     if (numOfRows == -1)
     {
-        printf("Pogreška pri otvaranju datoteke.\n");
-        return EXIT_FAILURE; // Zamjena ERROR_OF s EXIT_FAILURE
+        printf("Error opening the file.\n");
+        return EXIT_FAILURE; // Replaced ERROR_OF with EXIT_FAILURE
     }
 
-    Student *studenti = LoadStudents(fileName, numOfRows);
+    Student *students = LoadStudents(fileName, numOfRows);
 
-    if (studenti == NULL)
+    if (students == NULL)
     {
-        printf("Pogreška pri učitavanju studenata.\n");
-        return EXIT_FAILURE; // Zamjena ERROR_OF s EXIT_FAILURE
+        printf("Error loading students.\n");
+        return EXIT_FAILURE; // Replaced ERROR_OF with EXIT_FAILURE
     }
 
-    IspisiStudente(studenti, numOfRows);
+    PrintStudents(students, numOfRows);
 
-    free(studenti);
+    free(students);
 
-    return EXIT_SUCCESS; // Ispis uspjeha
+    return EXIT_SUCCESS; // Success message
 }
 
 int NumberOfRows(const char *fileName)
@@ -61,7 +61,7 @@ int NumberOfRows(const char *fileName)
     return numOfRows;
 }
 
-Student *LoadStudents(const char *fileName, int brojStudenata)
+Student *LoadStudents(const char *fileName, int numberOfStudents)
 {
     FILE *fp = fopen(fileName, "r");
     if (!fp)
@@ -69,28 +69,28 @@ Student *LoadStudents(const char *fileName, int brojStudenata)
         return NULL;
     }
 
-    Student *studenti = (Student *)malloc(brojStudenata * sizeof(Student));
-    if (studenti == NULL)
+    Student *students = (Student *)malloc(numberOfStudents * sizeof(Student));
+    if (students == NULL)
     {
         fclose(fp);
         return NULL;
     }
 
-    for (int i = 0; i < brojStudenata; i++)
+    for (int i = 0; i < numberOfStudents; i++)
     {
-        fscanf(fp, "%s %s %d", studenti[i].ime, studenti[i].prezime, &studenti[i].bodovi);
+        fscanf(fp, "%s %s %d", students[i].name, students[i].surname, &students[i].points);
     }
 
     fclose(fp);
-    return studenti;
+    return students;
 }
 
-void IspisiStudente(Student *studenti, int brojStudenata)
+void PrintStudents(Student *students, int numberOfStudents)
 {
-    for (int i = 0; i < brojStudenata; i++)
+    for (int i = 0; i < numberOfStudents; i++)
     {
-        double relativniBodovi = (double)studenti[i].bodovi / MAX_BODOVA * 100;
-        printf("Ime: %s, Prezime: %s, Apsolutni bodovi: %d, Relativni bodovi: %.2f%%\n",
-               studenti[i].ime, studenti[i].prezime, studenti[i].bodovi, relativniBodovi);
+        double relativePoints = (double)students[i].points / MAX_POINTS * 100;
+        printf("Name: %s, Surname: %s, Absolute Points: %d, Relative Points: %.2f%%\n",
+               students[i].name, students[i].surname, students[i].points, relativePoints);
     }
 }
