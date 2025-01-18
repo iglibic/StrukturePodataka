@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define _CRT_SECURE_NO_WARNINGS
-#define ERROR_OF 1
 #define MAX 1024
 #define MAX_BODOVA 100
 
-typedef struct {
+typedef struct
+{
     char ime[50];
     char prezime[50];
     int bodovi;
@@ -23,7 +23,7 @@ int main()
     if (numOfRows == -1)
     {
         printf("Pogreška pri otvaranju datoteke.\n");
-        return ERROR_OF;
+        return EXIT_FAILURE; // Zamjena ERROR_OF s EXIT_FAILURE
     }
 
     Student *studenti = LoadStudents(fileName, numOfRows);
@@ -31,14 +31,14 @@ int main()
     if (studenti == NULL)
     {
         printf("Pogreška pri učitavanju studenata.\n");
-        return ERROR_OF;
+        return EXIT_FAILURE; // Zamjena ERROR_OF s EXIT_FAILURE
     }
 
     IspisiStudente(studenti, numOfRows);
 
     free(studenti);
 
-    return 0;
+    return EXIT_SUCCESS; // Ispis uspjeha
 }
 
 int NumberOfRows(const char *fileName)
@@ -54,9 +54,7 @@ int NumberOfRows(const char *fileName)
 
     while (fgets(buffer, MAX, fp))
     {
-        if (buffer[0] != '\n' && buffer[0] != '\0') {
-            numOfRows++;
-        }
+        numOfRows++;
     }
 
     fclose(fp);
@@ -80,13 +78,7 @@ Student *LoadStudents(const char *fileName, int brojStudenata)
 
     for (int i = 0; i < brojStudenata; i++)
     {
-        if (fscanf(fp, "%s %s %d", studenti[i].ime, studenti[i].prezime, &studenti[i].bodovi) != 3)
-        {
-            printf("Greška u formatu datoteke na liniji %d.\n", i + 1);
-            free(studenti);
-            fclose(fp);
-            return NULL;
-        }
+        fscanf(fp, "%s %s %d", studenti[i].ime, studenti[i].prezime, &studenti[i].bodovi);
     }
 
     fclose(fp);
