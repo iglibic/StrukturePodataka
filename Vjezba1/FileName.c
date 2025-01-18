@@ -70,7 +70,6 @@ Students* LoadStudents(const char* fileName, int numOfStudents) {
     for (int i = 0; i < numOfStudents; i++) {
         fscanf(fp, "%s %s %d", students[i].name, students[i].surname, &students[i].points);
     }
-
     fclose(fp);
     return students;
 }
@@ -78,7 +77,7 @@ Students* LoadStudents(const char* fileName, int numOfStudents) {
 int printStudents(Students* students, int numOfStudents) {
     for (int i = 0; i < numOfStudents; i++) {
         float relativePoints = (float)students[i].points / MAX_POINTS * 100;
-        printf("Name: %s, Surname: %s, Points: %d, Relative points: %.2f%%\n",
+        printf("Name: %s, Surname: %s, Points: %d, Relative points: %f\n",
             students[i].name, students[i].surname, students[i].points, relativePoints);
     }
     return 0;
