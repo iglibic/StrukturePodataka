@@ -1,15 +1,19 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 /*2. Definirati strukturu osoba (ime, prezime, godina rođenja) i napisati program koji:
 A. dinamički dodaje novi element na početak liste,
 B. ispisuje listu,
 C. dinamički dodaje novi element na kraj liste,
 D. pronalazi element u listi (po prezimenu),
 E. briše određeni element iz liste,
-U zadatku se ne smiju koristiti globalne varijable.*/
+U zadatku se ne smiju koristiti globalne varijable.
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define _CRT_SECURE_NO_WARNINGS
+
+#define FILE_NOT_OPENED (-1)
+#define MAX_NAME 256
 
 typedef struct person* position;
 struct person {
@@ -19,79 +23,79 @@ struct person {
     position next;
 };
 
-position createPerson(char* fname, char* lname, int birth_year);
-int prepend_list(position head, char* fname, char* lname, int birth_year);
-int append_list(position head, char* fname, char* lname, int birth_year);
-int print_list(position first);
-position find_by_lname(position first, char* lname);
-position find_last(position head);
-position find_previous(position first, position target);
-int delete_person(position head, position target);
-int free_list(position head);
+position createNewPerson(char* fName, char* lName, int birthYear);
+int addFirst(position head, char* fName, char* lName, int birthYear);
+int addLast(position head, char* fName, char* lName, int birthYear);
+int printList(position first);
+position findLast(position head);
+position findByLname(position first, char* lName);
+position findPrevious(position first, position target);
+int deletePerson(position head, position toDelete);
+int freeList(position head);
 
 int main() {
     position head = (position)malloc(sizeof(struct person));
     if (!head) return EXIT_FAILURE;
     head->next = NULL;
 
-    addFirst(head, "Ivan", "Horvat", 1998);
-    addFirst(head, "Marko", "Novak", 2000);
-    addLast(head, "Ana", "Kovač", 1995);
+    addFirst(head, "Ivan", "Ivic", 2004);
+    addFirst(head, "Nika", "Nikic", 2011);
+    addLast(head, "Luka", "Lukic", 2006);
 
-    printf("List of persons:\n");
     printList(head->next);
 
-    position personToDelete = findByLname(head->next, "Novak");
-    if (personToDelete) {
-        deletePerson(head, personToDelete);
-        printf("\nUpdated list after deletion:\n");
+    position toDelete = findByLname(head->next, "Ivic");
+    if (toDelete) {
+        deletePerson(head, toDelete);
         printList(head->next);
     }
 
     freeList(head);
-
     return EXIT_SUCCESS;
 }
 
-position createPerson(char* fname, char* lname, int birth_year) {
-    position new_person = (position)malloc(sizeof(struct person));
-    if (new_person == NULL) {
-        printf("Error: Memory allocation failed!");
+position createNewPerson(char* fName, char* lName, int birthYear) {
+    position newPerson = (position)malloc(sizeof(struct person));
+    if (newPerson == NULL) {
+        printf("ERROR! Could not allocate the memmory!");
         return NULL;
     }
-    strcpy(new_person->fname, fname);
-    strcpy(new_person->lname, lname);
-    new_person->birth_year = birth_year;
-    new_person->next = NULL;
 
-    return new_person;
+    strcpy(newPerson->fname, fName);
+    strcpy(newPerson->lname, lName);
+    newPerson->birth_year = birthYear;
+    newPerson->next = NULL;
+
+    return newPerson;
 }
 
-int prepend_list(position head, char* fname, char* lname, int birth_year) {
-    position new_person = createPerson(fname, lname, birth_year);
-    if (new_person == NULL) {
-        printf("Error: Could not allocate the memory!");
-        return -1;
+int addFirst(position head, char* fName, char* lName, int birthYear) {
+    position newPerson = createNewPerson(fName, lName, birthYear);
+    if (newPerson == NULL) {
+        printf("ERROR! Could not allocate the memmory!");
+        return FILE_NOT_OPENED;
     }
-    new_person->next = head->next;
-    head->next = new_person;
+
+    newPerson->next = head->next;
+    head->next = newPerson;
 
     return EXIT_SUCCESS;
 }
 
-int append_list(position head, char* fname, char* lname, int birth_year) {
-    position new_person = createPerson(fname, lname, birth_year);
-    if (new_person == NULL) {
-        printf("Error: Could not allocate the memory!");
-        return -1;
+int addLast(position head, char* fName, char* lName, int birthYear) {
+    position newPerson = createNewPerson(fName, lName, birthYear);
+    if (newPerson == NULL) {
+        printf("ERROR! Could not allocate the memmory!");
+        return FILE_NOT_OPENED;
     }
-    position last = find_last(head);
-    last->next = new_person;
+
+    position last = findLast(head);
+    last->next = newPerson;
 
     return EXIT_SUCCESS;
 }
 
-int print_list(position first) {
+int printList(position first) {
     position temp = first;
 
     while (temp) {
@@ -102,7 +106,7 @@ int print_list(position first) {
     return EXIT_SUCCESS;
 }
 
-position find_last(position head) {
+position findLast(position head) {
     position temp = head;
 
     while (temp->next) {
@@ -112,22 +116,24 @@ position find_last(position head) {
     return temp;
 }
 
-position find_by_lname(position head, char* lname) {
-    position temp = head;
+position findByLname(position first, char* lName) {
+    position temp = first;
 
     while (temp) {
-        if (strcmp(temp->lname, lname) == 0) {
+        if (strcmp(temp->lname, lName) == 0) {
             return temp;
         }
         temp = temp->next;
     }
+
     return NULL;
 }
 
-position find_previous(position first, position target) {
+position findPrevious(position first, position target) {
     position temp = first;
 
-    if (first == target) {
+    if (target == NULL) {
+        printf("ERROR!");
         return NULL;
     }
 
@@ -138,25 +144,30 @@ position find_previous(position first, position target) {
     return temp;
 }
 
-int delete_person(position head, position toDelete) {
+int deletePerson(position head, position toDelete) {
     if (head == NULL || toDelete == NULL) {
+        return FILE_NOT_OPENED;
+    }
+
+    if (head->next == toDelete) { // Ako je toDelete prvi element
+        head->next = toDelete->next;
+        free(toDelete);
+        return EXIT_SUCCESS;
+    }
+
+    position previous = findPrevious(head, toDelete);
+    if (previous == NULL) {
         printf("Error!");
         return -1;
     }
 
-    position previous = find_previous(head, toDelete); {
-        if (previous == NULL) {
-            printf("Error!");
-            return -1;
-        }
-    }
     previous->next = toDelete->next;
     free(toDelete);
 
     return EXIT_SUCCESS;
 }
 
-int free_list(position head) {
+int freeList(position head) {
     position temp = head->next;
 
     while (temp) {
