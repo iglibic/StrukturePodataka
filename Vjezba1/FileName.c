@@ -1,83 +1,100 @@
+/*1. Napisati program koji prvo pročita koliko redaka ima datoteka, tj. koliko ima studenata
+zapisanih u datoteci. Nakon toga potrebno je dinamički alocirati prostor za niz struktura
+studenata (ime, prezime, bodovi) i učitati iz datoteke sve zapise. Na ekran ispisati ime,
+prezime, apsolutni i relativni broj bodova.
+Napomena: Svaki redak datoteke sadrži ime i prezime studenta, te broj bodova na kolokviju.
+relatvan_br_bodova = br_bodova/max_br_bodova*100
+*/
+
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define _CRT_SECURE_NO_WARNINGS
 
-#define FILE_NOT_OPENED (-1)
-#define MAX 1024
 #define MAX_POINTS 100
+#define MAX_NAME_LENGTH 256
+#define FILE_NOT_OPENED (-1)
 
 typedef struct {
-	char name[MAX];
-	char surname[MAX];
-	int points;
-}Students;
+    char fName[MAX_NAME_LENGTH];
+    char lName[MAX_NAME_LENGTH];
+    int points;
+} Student;
 
-int numOfRows(const char* fileName);
-Students* LoadStudents(const char* fileName, int numOfStudents);
-int printStudents(Students* students, int numOfStudents);
+int numOfRows(const char* FileName);
+Student* loadStudents(const char* FileName, int numOfStudents);
+int printStudents(Student* student, int numOfStudents);
 
 int main() {
+    int totalStudent = numOfRows("Studenti.txt");
 
-	int numberOfStudents = numOfRows("Studenti.txt");
-	
-	Students* students = LoadStudents("Studenti.txt", numberOfStudents);
-	if (students == NULL) {
-		printf("Error: Could not load students!");
-		return EXIT_FAILURE;
-	}
+    if (totalStudent == FILE_NOT_OPENED || totalStudent == 0) {
+        printf("No students found or file could not be opened!\n");
+        return EXIT_FAILURE;
+    }
 
-	printStudents(students, numberOfStudents);
+    Student* students = loadStudents("Studenti.txt", totalStudent);
+    if (students == NULL) {
+        return EXIT_FAILURE;
+    }
 
-	free(students);
+    printStudents(students, totalStudent);
+    free(students);
 
-	return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
 
-int numOfRows(const char* fileName) {
-	FILE* fp = fopen(fileName, "r");
-		if (fp == NULL) {
-			printf("Error: Could not open the file!");
-			return FILE_NOT_OPENED;
-		}
+int numOfRows(const char* FileName) {
+    FILE* fp = fopen(FileName, "r");
+    if (fp == NULL) {
+        printf("File could not be opened!\n");
+        return FILE_NOT_OPENED;
+    }
 
-	int totalStudents = 0;
-	char buffer[MAX] = 0;
+    int totalStudents = 0;
+    char buffer[256];
 
-	while (fgets(buffer, MAX, fp)) {
-		totalStudents++;
-	}
+    while (fgets(buffer, sizeof(buffer), fp)) {
+        totalStudents++;
+    }
 
-	fclose(fp);
-
-	return totalStudents;
+    fclose(fp);
+    return totalStudents;
 }
 
-Students* LoadStudents(const char* fileName, int numOfStudents) {
-	FILE* fp = fopen(fileName, "r");
-		if (fp == NULL) {
-			printf("Error: Could not open the file!");
-			return NULL; //Vraća NULL jer funkcija ne vraća vrijednost nego pokazivač, pa ne može vratiti neku vrijednost
-		}
+Student* loadStudents(const char* FileName, int numOfStudents) {
+    FILE* fp = fopen(FileName, "r");
+    if (fp == NULL) {
+        printf("File could not be opened!\n");
+        return NULL;
+    }
 
-	Students* students = (Students*)malloc(numOfStudents * sizeof(Students));
-	if (students == NULL) {
-		fclose(fp);
-		return NULL;
-	}
+    Student* student = (Student*)malloc(numOfStudents * sizeof(Student));
+    if (student == NULL) {
+        fclose(fp);
+        printf("Error! Could not allocate memory!\n");
+        return NULL;
+    }
 
-	for (int i = 0; i < numOfStudents; i++) {
-		fscanf(fp, "%s %s %d", students[i].name, students[i].surname, &students[i].points);
-	}
+    for (int i = 0; i < numOfStudents; i++) {
+        if (fscanf(fp, "%s %s %d", student[i].fName, student[i].lName, &student[i].points) != 3) {
+            printf("Error reading student data.\n");
+            free(student);
+            fclose(fp);
+            return NULL;
+        }
+    }
 
-	fclose(fp);
-
-	return students;
+    fclose(fp);
+    return student;
 }
 
-int printStudents(Students* students, int numOfStudents) {
-	for (int i = 0; i < numOfStudents; i++) {
-		float relativePoints = (float)students[i].points / MAX_POINTS * 100;
-		printf("Name: %s %s, Points: %d, Relative points: %f", students[i].name, students[i].surname, students[i].points, relativePoints);
-	}
+int printStudents(Student* student, int numOfStudents) {
+    for (int i = 0; i < numOfStudents; i++) {
+        double relativePoints = (double)student[i].points / MAX_POINTS * 100;
+        printf("Name: %s %s \nPoints: %d \nRelative points: %.2f%%\n\n",
+            student[i].fName, student[i].lName, student[i].points, relativePoints);
+    }
+
+    return EXIT_SUCCESS;
 }
