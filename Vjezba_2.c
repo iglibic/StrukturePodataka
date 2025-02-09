@@ -30,43 +30,35 @@ int delete_person(position head, position target);
 int free_list(position head);
 
 int main() {
-    struct person head = { .next = NULL };
+    position head = (position)malloc(sizeof(struct person));
+    if (!head) return EXIT_FAILURE;
+    head->next = NULL;
 
-    prepend_list(&head, "Ivan", "Horvat", 1995);
-    prepend_list(&head, "Marko", "Novak", 1993);
-    append_list(&head, "Ana", "Ivić", 1996);
+    addFirst(head, "Ivan", "Horvat", 1998);
+    addFirst(head, "Marko", "Novak", 2000);
+    addLast(head, "Ana", "Kovač", 1995);
 
-    printf("List of students:\n");
-    print_list(head.next);
+    printf("List of persons:\n");
+    printList(head->next);
 
-    char search_name[] = "Ivić";
-    position found = find_by_lname(head.next, search_name);
-    if (found != NULL) {
-        printf("\nFound student: %s %s, Born: %d\n", found->fname, found->lname, found->birth_year);
-    }
-    else {
-        printf("\nStudent with last name %s not found.\n", search_name);
-    }
-
-    if (found != NULL) {
-        printf("\nDeleting student %s %s...\n", found->fname, found->lname);
-        delete_person(&head, found);
+    position personToDelete = findByLname(head->next, "Novak");
+    if (personToDelete) {
+        deletePerson(head, personToDelete);
+        printf("\nUpdated list after deletion:\n");
+        printList(head->next);
     }
 
-    printf("\nList after deletion:\n");
-    print_list(head.next);
+    freeList(head);
 
-    free_list(&head);
-
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 position createPerson(char* fname, char* lname, int birth_year) {
     position new_person = (position)malloc(sizeof(struct person));
-        if (new_person == NULL) {
-            printf("Error: Memory allocation failed!");
-            return NULL;
-        }
+    if (new_person == NULL) {
+        printf("Error: Memory allocation failed!");
+        return NULL;
+    }
     strcpy(new_person->fname, fname);
     strcpy(new_person->lname, lname);
     new_person->birth_year = birth_year;
@@ -83,7 +75,7 @@ int prepend_list(position head, char* fname, char* lname, int birth_year) {
     }
     new_person->next = head->next;
     head->next = new_person;
-    
+
     return EXIT_SUCCESS;
 }
 
@@ -101,7 +93,7 @@ int append_list(position head, char* fname, char* lname, int birth_year) {
 
 int print_list(position first) {
     position temp = first;
-    
+
     while (temp) {
         printf("First name: %s\n Last name: %s\n Birth year: %d\n", temp->fname, temp->lname, temp->birth_year);
         temp = temp->next;
