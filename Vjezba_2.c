@@ -76,8 +76,8 @@ int addFirst(position head, char* fName, char* lName, int birthYear) {
         return FILE_NOT_OPENED;
     }
 
-    newPerson->next = head->next;
-    head->next = newPerson;
+    lastPerson->next = newPerson;
+newPerson->next = NULL;
 
     return EXIT_SUCCESS;
 }
